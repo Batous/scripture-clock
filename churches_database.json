@@ -1,0 +1,108 @@
+{
+  "churches": [
+    {
+      "id": "church001",
+      "name": "Grace Community Church",
+      "location": "Johannesburg, South Africa",
+      "timezone": "Africa/Johannesburg",
+      "tradition": "protestant",
+      "pastor": "Pastor John Smith",
+      "contact": "pastor@gracechurch.example",
+      "liveStream": {
+        "isActive": false,
+        "url": "",
+        "title": "",
+        "startTime": "",
+        "endTime": "",
+        "schedule": [
+          {
+            "day": "Sunday",
+            "time": "09:00",
+            "duration": 120,
+            "title": "Sunday Morning Service"
+          },
+          {
+            "day": "Wednesday",
+            "time": "18:30",
+            "duration": 90,
+            "title": "Midweek Bible Study"
+          }
+        ]
+      }
+    },
+    {
+      "id": "church002",
+      "name": "Igreja Batista Central",
+      "location": "São Paulo, Brasil",
+      "timezone": "America/Sao_Paulo",
+      "tradition": "protestant",
+      "pastor": "Pastor Carlos Silva",
+      "contact": "pastor@igrejabatista.example",
+      "liveStream": {
+        "isActive": false,
+        "url": "",
+        "title": "",
+        "startTime": "",
+        "endTime": "",
+        "schedule": [
+          {
+            "day": "Sunday",
+            "time": "10:00",
+            "duration": 150,
+            "title": "Culto Dominical"
+          }
+        ]
+      }
+    },
+    {
+      "id": "church003",
+      "name": "Église Évangélique de Paris",
+      "location": "Paris, France",
+      "timezone": "Europe/Paris",
+      "tradition": "protestant",
+      "pastor": "Pasteur Marie Dubois",
+      "contact": "pasteur@egliseparis.example",
+      "liveStream": {
+        "isActive": false,
+        "url": "",
+        "title": "",
+        "startTime": "",
+        "endTime": "",
+        "schedule": [
+          {
+            "day": "Sunday",
+            "time": "11:00",
+            "duration": 120,
+            "title": "Culte du Dimanche"
+          }
+        ]
+      }
+    },
+    {
+      "id": "church004",
+      "name": "Iglesia Cristiana Esperanza",
+      "location": "Madrid, España",
+      "timezone": "Europe/Madrid",
+      "tradition": "catholic",
+      "pastor": "Padre Miguel García",
+      "contact": "padre@iglesiaesperanza.example",
+      "liveStream": {
+        "isActive": false,
+        "url": "",
+        "title": "",
+        "startTime": "",
+        "endTime": "",
+        "schedule": [
+          {
+            "day": "Sunday",
+            "time": "12:00",
+            "duration": 90,
+            "title": "Misa Dominical"
+          }
+        ]
+      }
+    }
+  ],
+  "lastUpdated": "2025-02-14T10:00:00Z",
+  "version": "1.0"
+}
