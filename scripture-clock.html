@@ -149,15 +149,26 @@
         
         #datetime {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            font-size: 28px;
-            font-weight: bold;
+            top: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
             background: rgba(0,0,0,0.3);
-            padding: 15px 25px;
+            padding: 20px 40px;
             border-radius: 10px;
             z-index: 1000;
+        }
+        
+        .date-line {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .time-line {
+            font-size: 56px;
+            font-weight: bold;
         }
         
         #liturgical-info {
@@ -190,41 +201,42 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 120px 40px 80px 40px;
+            padding: 200px 40px 80px 40px;
             text-align: center;
         }
         
         .verse-container {
             background: rgba(255,255,255,0.15);
             backdrop-filter: blur(10px);
-            padding: 40px;
+            padding: 80px;
             border-radius: 20px;
-            max-width: 1000px;
+            max-width: 1800px;
+            width: 90%;
             margin: 0 auto;
             box-shadow: 0 8px 32px rgba(0,0,0,0.3);
         }
         
         .passage-title {
-            font-size: 28px;
+            font-size: 44px;
             font-weight: bold;
             color: #ffd700;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
         
         .verse {
-            font-size: 24px;
+            font-size: 48px;
             line-height: 1.8;
-            margin-bottom: 15px;
+            margin-bottom: 30px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
         }
         
         .reference {
-            font-size: 22px;
+            font-size: 40px;
             font-weight: bold;
             font-style: italic;
             color: #ffd700;
-            margin-top: 20px;
+            margin-top: 30px;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
         }
         
@@ -284,9 +296,8 @@
         
         #settings-btn {
             position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            bottom: 20px;
+            right: 20px;
             background: rgba(0,0,0,0.3);
             border: 2px solid rgba(255,255,255,0.3);
             color: white;
@@ -296,10 +307,13 @@
             cursor: pointer;
             z-index: 1000;
             font-family: Georgia, serif;
+            opacity: 0.6;
+            transition: opacity 0.3s;
         }
         
         #settings-btn:hover {
             background: rgba(0,0,0,0.5);
+            opacity: 1;
         }
         
         #audio-indicator {
@@ -326,13 +340,37 @@
         footer {
             position: fixed;
             bottom: 10px;
-            right: 10px;
+            left: 10px;
             font-size: 14px;
-            opacity: 0.7;
+            opacity: 0.6;
             z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        
+        footer:hover {
+            opacity: 1;
         }
         
         footer a {
+            color: #ffd700;
+            text-decoration: none;
+        }
+        
+        #about-link {
+            position: fixed;
+            bottom: 10px;
+            right: 90px;
+            font-size: 14px;
+            opacity: 0.6;
+            z-index: 1000;
+            transition: opacity 0.3s;
+        }
+        
+        #about-link:hover {
+            opacity: 1;
+        }
+        
+        #about-link a {
             color: #ffd700;
             text-decoration: none;
         }
@@ -381,6 +419,9 @@
             <!-- Church Selection -->
             <div class="setup-section">
                 <h2>⛪ Select Your Church</h2>
+                <p style="font-size: 16px; opacity: 0.8; margin-bottom: 15px;">
+                    Choose your church to receive live stream notifications, or select "Offline Mode" to use without a church.
+                </p>
                 <select id="church-select">
                     <option value="">Loading churches...</option>
                 </select>
@@ -407,7 +448,10 @@
             <div class="season-name"></div>
             <div class="day-name"></div>
         </div>
-        <div id="datetime"></div>
+        <div id="datetime">
+            <div class="date-line" id="date-display"></div>
+            <div class="time-line" id="time-display"></div>
+        </div>
         <div id="content">
             <div class="verse-container" id="verses"></div>
         </div>
@@ -423,6 +467,10 @@
         <footer>
             <a href="mailto:feedback@scriptureclock.io">💬 Feedback & Suggestions</a>
         </footer>
+        
+        <div id="about-link">
+            <a href="about.html">ℹ️ About Us</a>
+        </div>
     </div>
 
     <script>
@@ -605,6 +653,18 @@
             const select = document.getElementById('church-select');
             select.innerHTML = '<option value="">-- Select your church --</option>';
             
+            // Add "None / Offline Mode" option
+            const offlineOption = document.createElement('option');
+            offlineOption.value = 'offline';
+            offlineOption.textContent = '🏠 None - Offline Mode (No live streams)';
+            select.appendChild(offlineOption);
+            
+            // Add separator
+            const separator = document.createElement('option');
+            separator.disabled = true;
+            separator.textContent = '────────────────────';
+            select.appendChild(separator);
+            
             churches.forEach(church => {
                 const option = document.createElement('option');
                 option.value = church.id;
@@ -619,7 +679,7 @@
         
         function startDisplay() {
             if (!config.church) {
-                alert('Please select your church');
+                alert('Please select your church or choose "Offline Mode"');
                 return;
             }
             
@@ -642,6 +702,12 @@
         
         // Check for live streams
         async function checkLiveStreams() {
+            // Skip if in offline mode
+            if (config.church === 'offline') {
+                hideLiveStreamBanner();
+                return;
+            }
+            
             try {
                 const response = await fetch('churches_database.json');
                 const data = await response.json();
@@ -655,6 +721,7 @@
                 }
             } catch (error) {
                 console.error('Error checking live streams:', error);
+                hideLiveStreamBanner();
             }
         }
         
@@ -814,19 +881,28 @@
         // Display functions
         function updateDateTime() {
             const now = new Date();
-            const options = { 
+            
+            // Date options (Saturday, February 14, 2026)
+            const dateOptions = { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
-                day: 'numeric',
+                day: 'numeric'
+            };
+            
+            // Time options (11:07:25 AM)
+            const timeOptions = {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
             };
+            
             const locale = config.language === 'en' ? 'en-US' : 
                           config.language === 'fr' ? 'fr-FR' :
                           config.language === 'es' ? 'es-ES' : 'pt-BR';
-            document.getElementById('datetime').textContent = now.toLocaleDateString(locale, options);
+            
+            document.getElementById('date-display').textContent = now.toLocaleDateString(locale, dateOptions);
+            document.getElementById('time-display').textContent = now.toLocaleTimeString(locale, timeOptions);
         }
         
         function updateLiturgicalInfo() {
@@ -905,6 +981,63 @@
             // Check for live streams every minute
             checkLiveStreams();
             setInterval(checkLiveStreams, 60000);
+            
+            // Attempt to prevent screen sleep
+            preventScreenSleep();
+        }
+        
+        function preventScreenSleep() {
+            // Method 1: Wake Lock API (modern browsers)
+            if ('wakeLock' in navigator) {
+                navigator.wakeLock.request('screen')
+                    .then(wakeLock => {
+                        console.log('Wake Lock enabled');
+                        
+                        // Re-acquire wake lock if page becomes visible again
+                        document.addEventListener('visibilitychange', () => {
+                            if (document.visibilityState === 'visible') {
+                                navigator.wakeLock.request('screen');
+                            }
+                        });
+                    })
+                    .catch(err => {
+                        console.log('Wake Lock not supported:', err);
+                    });
+            }
+            
+            // Method 2: NoSleep.js technique - play silent video
+            const video = document.createElement('video');
+            video.setAttribute('loop', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('playsinline', '');
+            video.style.display = 'none';
+            
+            // Tiny base64 encoded mp4 video (1 frame, silent)
+            video.src = 'data:video/mp4;base64,AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAAIZnJlZQAAAAhtZGF0AAAA1m1vb3YAAABsbXZoZAAAAAAAAAAAAAAAAAAAA+gAAAAAAAEAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAABidWR0YQAAAFptZXRhAAAAAAAAACFoZGxyAAAAAAAAAABtZGlyYXBwbAAAAAAAAAAAAAAAAC1pbHN0AAAAJal0b28AAAAdZGF0YQAAAAEAAAAATGF2ZjU4Ljc2LjEwMA==';
+            
+            document.body.appendChild(video);
+            
+            // Play video on any user interaction
+            const startVideo = () => {
+                video.play().catch(() => {});
+                document.removeEventListener('click', startVideo);
+                document.removeEventListener('touchstart', startVideo);
+            };
+            
+            document.addEventListener('click', startVideo);
+            document.addEventListener('touchstart', startVideo);
+            
+            // Auto-attempt after 1 second
+            setTimeout(() => video.play().catch(() => {}), 1000);
+            
+            // Method 3: Periodic activity ping
+            setInterval(() => {
+                // Trigger a tiny layout recalc to keep browser active
+                document.body.style.opacity = '0.9999';
+                setTimeout(() => {
+                    document.body.style.opacity = '1';
+                }, 10);
+            }, 30000); // Every 30 seconds
         }
         
         // Load saved config on startup
