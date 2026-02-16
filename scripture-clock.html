@@ -387,6 +387,178 @@
         .bg-easter .reference {
             color: #b8860b;
         }
+        /* Settings Panel */
+#settings-panel {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5000;
+}
+
+.settings-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+}
+
+.settings-container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    color: #1d1d1f;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.settings-container h2 {
+    color: #667eea;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.setting-item {
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.setting-item:last-of-type {
+    border-bottom: none;
+}
+
+.setting-item label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #1d1d1f;
+}
+
+.setting-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.setting-item select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #d0d0d0;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #1d1d1f;
+    background: white;
+}
+
+.setting-help {
+    font-size: 14px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.prayer-times-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.prayer-times-grid label {
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+}
+
+.setting-actions {
+    margin-top: 30px;
+    display: flex;
+    gap: 15px;
+}
+
+.save-btn, .cancel-btn {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.save-btn {
+    background: #667eea;
+    color: white;
+}
+
+.save-btn:hover {
+    background: #5568d3;
+}
+
+.cancel-btn {
+    background: #e0e0e0;
+    color: #1d1d1f;
+}
+
+.cancel-btn:hover {
+    background: #d0d0d0;
+}
+        #prayer-notification {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 3000;
+    animation: slideUp 0.5s ease-out;
+}
+
+.prayer-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+}
+
+.prayer-banner h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+.prayer-banner p {
+    font-size: 20px;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+        /* Dark Theme */
+#main-display.dark-theme {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+#main-display.dark-theme .verse-container {
+    background: rgba(255,255,255,0.08);
+}
+
+#main-display.dark-theme #datetime,
+#main-display.dark-theme #liturgical-info {
+    background: rgba(0,0,0,0.5);
+}
+
+        
     </style>
 </head>
 <body>
@@ -443,7 +615,7 @@
 
     <!-- Main Display -->
     <div id="main-display">
-        <button id="settings-btn" onclick="showSetup()">⚙️ <span id="settings-text">Settings</span></button>
+        <button id="settings-btn" onclick="openSettingsPanel()">⚙️ <span id="settings-text">Settings</span></button>
         <div id="liturgical-info">
             <div class="season-name"></div>
             <div class="day-name"></div>
@@ -452,6 +624,12 @@
             <div class="date-line" id="date-display"></div>
             <div class="time-line" id="time-display"></div>
         </div>
+        <div id="prayer-notification" style="display: none;">
+    <div class="prayer-banner">
+        <h2>🙏 Prayer Time</h2>
+        <p id="prayer-message"></p>
+    </div>
+</div>
         <div id="content">
             <div class="verse-container" id="verses"></div>
         </div>
@@ -472,6 +650,55 @@
             <a href="about.html">ℹ️ About Us</a>
         </div>
     </div>
+    <!-- Settings Panel Modal -->
+<div id="settings-panel" style="display: none;">
+    <div class="settings-overlay" onclick="closeSettingsPanel()"></div>
+    <div class="settings-container">
+        <h2>⚙️ Settings</h2>
+        
+        <div class="setting-item">
+            <label>
+                <input type="checkbox" id="audio-toggle" checked>
+                🔊 Enable Audio Playback
+            </label>
+            <p class="setting-help">Play scripture verses aloud during permitted hours</p>
+        </div>
+        
+        <div class="setting-item">
+            <label>
+                <input type="checkbox" id="live-toggle" checked>
+                📺 Enable Live Streams
+            </label>
+            <p class="setting-help">Show live stream notifications when available</p>
+        </div>
+        
+        <div class="setting-item">
+            <label>Dark Mode</label>
+            <select id="theme-select">
+                <option value="auto">Auto (8 PM - 6 AM)</option>
+                <option value="light">Always Light</option>
+                <option value="dark">Always Dark</option>
+            </select>
+        </div>
+        
+        <div class="setting-item">
+            <label>Prayer Times</label>
+            <div class="prayer-times-grid">
+                <label><input type="checkbox" class="prayer-hour" value="6"> 6 AM</label>
+                <label><input type="checkbox" class="prayer-hour" value="7"> 7 AM</label>
+                <label><input type="checkbox" class="prayer-hour" value="12"> 12 PM</label>
+                <label><input type="checkbox" class="prayer-hour" value="18"> 6 PM</label>
+                <label><input type="checkbox" class="prayer-hour" value="21"> 9 PM</label>
+            </div>
+            <p class="setting-help">Get prayer reminders at selected hours</p>
+        </div>
+        
+        <div class="setting-actions">
+            <button onclick="saveSettings()" class="save-btn">Save Settings</button>
+            <button onclick="closeSettingsPanel()" class="cancel-btn">Cancel</button>
+        </div>
+    </div>
+</div>
 
     <script>
         // Configuration
@@ -484,6 +711,13 @@
         
         let churches = [];
         let currentLiveStream = null;
+
+        const LIVE_FEEDS = {};
+        const CHURCH_FEEDS = {};
+        const LECTIONARY_FEEDS = {};
+        const LITURGIC_EVENT_FEEDS = {};
+        const LIVE_FEED_RESTRICTIONS = { restricted: [1, 2, 3, 4, 5] };
+        const AUDIO_PERMISSIONS = { allowed: [6, 7, 17, 18, 19, 20] };
         
         // Translations
         const translations = {
@@ -536,6 +770,8 @@
                 ordinaryTime: 'Tempo Comum'
             }
         };
+
+
         
         // Setup screen handling
         document.querySelectorAll('.option-btn').forEach(btn => {
@@ -843,7 +1079,7 @@
         }
         
         // Sample Bible verses (would be fetched from Bible.com API in production)
-        const sampleVerses = {
+           const sampleVerses = {
             en: [
                 { title: 'John 3:16', text: 'For God so loved the world that he gave his one and only Son, that whoever believes in him shall not perish but have eternal life.', ref: 'John 3:16' },
                 { title: 'Psalm 23:1', text: 'The Lord is my shepherd, I lack nothing.', ref: 'Psalm 23:1' },
@@ -877,13 +1113,102 @@
             const index = Math.floor(hour / 6) % verses.length;
             return verses[index];
         }
-        
-        // Display functions
-        function updateDateTime() {
+
+        // NEW: Modular feed priority system
+       function getFeedForDateAndTime() {
+       // Get current date/time
             const now = new Date();
+            const dateStr = getCurrentDateString(); // Use existing helper
+            const actualHour = now.getHours();
+            const feedKey = `${dateStr}-${String(actualHour).padStart(2, '0')}`;
+    
+    // Load user settings
+            const settings = JSON.parse(localStorage.getItem('userSettings')) || {
+           liveEnabled: true,
+           audioEnabled: true,
+           prayerHours: [6, 12, 18, 21]
+    };
+    
+    // PRIORITY 1: Prayer Notification (handled separately by checkPrayerTime)
+    // Skip here, handled by separate function
+    
+    // PRIORITY 2: Live Feeds
+    if (settings.liveEnabled && LIVE_FEEDS[feedKey] && isLiveAllowedNow()) {
+        return {
+            type: 'live',
+            content: {
+                url: LIVE_FEEDS[feedKey],
+                title: 'Live Church Service'
+            },
+            audio: false
+        };
+    }
+    
+    // PRIORITY 3: Church Feeds (from external JSON)
+    if (CHURCH_FEEDS[feedKey]) {
+        return {
+            type: 'church',
+            content: CHURCH_FEEDS[feedKey],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 4: Liturgic Event Feeds (special days like Christmas, Easter)
+    if (LITURGIC_EVENT_FEEDS[dateStr]) {
+        return {
+            type: 'liturgic',
+            content: LITURGIC_EVENT_FEEDS[dateStr],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 5: Lectionary Feeds (daily readings based on liturgical calendar)
+    if (LECTIONARY_FEEDS[dateStr]) {
+        return {
+            type: 'lectionary',
+            content: LECTIONARY_FEEDS[dateStr],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 6: FALLBACK - Use your existing verse rotation system
+    const verse = getTodaysVerse(); // ← THIS IS THE BRIDGE to your existing code
+    return {
+        type: 'default',
+        content: verse, // verse already has .title, .text, .ref
+        audio: settings.audioEnabled && isAudioAllowedNow()
+    };
+}
+
+// Helper function: Check if live feeds allowed at this hour
+        function isLiveAllowedNow() {
+            const hour = new Date().getHours();
+            const hourIndex = hour <= 12 ? hour : hour - 12; // Convert to 12h
+            return !LIVE_FEED_RESTRICTIONS.restricted.includes(hourIndex);
+}
+
+// Helper function: Check if audio allowed at this hour
+        function isAudioAllowedNow() {
+        const hour = new Date().getHours();
+        const hourIndex = hour <= 12 ? hour : hour - 12; // Convert to 12h
+        return AUDIO_PERMISSIONS.allowed.includes(hourIndex);
+}
+
+// Helper function: Get date string (if you don't already have it)
+        function getCurrentDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+        
+ // Display functions
+        function updateDateTime() {
+    const now = new Date();
             
             // Date options (Saturday, February 14, 2026)
-            const dateOptions = { 
+    const dateOptions = { 
                 weekday: 'long', 
                 year: 'numeric', 
                 month: 'long', 
@@ -891,13 +1216,13 @@
             };
             
             // Time options (11:07:25 AM)
-            const timeOptions = {
+    const timeOptions = {
                 hour: '2-digit',
                 minute: '2-digit',
                 second: '2-digit'
             };
             
-            const locale = config.language === 'en' ? 'en-US' : 
+    const locale = config.language === 'en' ? 'en-US' : 
                           config.language === 'fr' ? 'fr-FR' :
                           config.language === 'es' ? 'es-ES' : 'pt-BR';
             
@@ -905,39 +1230,62 @@
             document.getElementById('time-display').textContent = now.toLocaleTimeString(locale, timeOptions);
         }
         
-        function updateLiturgicalInfo() {
-            const now = new Date();
-            const info = getLiturgicalInfo(now);
+    function updateLiturgicalInfo() {
+    const now = new Date();
+    const info = getLiturgicalInfo(now);
             
             document.querySelector('.season-name').textContent = info.season;
             document.querySelector('.day-name').textContent = info.day;
             
-            const display = document.getElementById('main-display');
+    const display = document.getElementById('main-display');
             display.className = info.bg;
         }
         
-        function updateDisplay() {
-            const verse = getTodaysVerse();
-            
-            const html = `
-                <div class="passage-title">${verse.title}</div>
-                <div class="verse">${verse.text}</div>
-                <div class="reference">${verse.ref}</div>
-            `;
-            
-            document.getElementById('verses').innerHTML = html;
-            
-            if (shouldPlayAudio()) {
-                speakText(`${verse.title}. ${verse.text}. ${verse.ref}`);
-            }
-        }
+       function updateDisplay() {
+    // Use the new priority system
+           const feedData = getFeedForDateAndTime();
+    
+    // Handle different feed types
+    if (feedData.type === 'live') {
+        // Show live stream banner
+        const html = `
+            <div style="background: linear-gradient(135deg, #ff3b30 0%, #ff9500 100%); 
+                        color: white; padding: 40px; border-radius: 12px; text-align: center;">
+                <h2 style="font-size: 32px; margin-bottom: 15px;">🔴 LIVE NOW</h2>
+                <p style="font-size: 20px; margin-bottom: 20px;">${feedData.content.title}</p>
+                <a href="${feedData.content.url}" target="_blank" 
+                   style="display: inline-block; background: white; color: #ff3b30; 
+                          padding: 15px 30px; border-radius: 8px; text-decoration: none; 
+                          font-weight: bold;">
+                    Watch Service →
+                </a>
+            </div>
+        `;
+        document.getElementById('verses').innerHTML = html;
         
-        function shouldPlayAudio() {
+    } else {
+        // Show scripture verse (all other types)
+        const verse = feedData.content;
+        const html = `
+            <div class="passage-title">${verse.title || verse.reference}</div>
+            <div class="verse">${verse.text}</div>
+            <div class="reference">${verse.ref || verse.reference}</div>
+        `;
+        document.getElementById('verses').innerHTML = html;
+        
+        // Play audio if enabled and allowed
+        if (feedData.audio && shouldPlayAudio()) {
+            const textToSpeak = `${verse.title || verse.reference}. ${verse.text}. ${verse.ref || verse.reference}`;
+            speakText(textToSpeak);
+        }
+    }
+}
+       function shouldPlayAudio() {
             const hour = new Date().getHours();
             return (hour >= 6 && hour < 8) || (hour >= 17 && hour < 21);
         }
         
-        function speakText(text) {
+       function speakText(text) {
             if ('speechSynthesis' in window) {
                 const indicator = document.getElementById('audio-indicator');
                 indicator.style.display = 'block';
@@ -969,7 +1317,7 @@
             }
         }
         
-        function initializeDisplay() {
+    function initializeDisplay() {
             updateDateTime();
             updateLiturgicalInfo();
             updateDisplay();
@@ -984,11 +1332,107 @@
             
             // Attempt to prevent screen sleep
             preventScreenSleep();
+            // Apply saved theme
+            const settings = JSON.parse(localStorage.getItem('userSettings')) || {theme: 'auto'};
+            applyTheme(settings.theme);
+
+            // Re-apply theme every hour
+            setInterval(() => {
+            const settings = JSON.parse(localStorage.getItem('userSettings')) || {theme: 'auto'};
+            applyTheme(settings.theme);
+             }, 60000);
         }
-        
-        function preventScreenSleep() {
+         // NEW: Modular feed priority system
+    function getFeedForDateAndTime() {
+         // Get current date/time
+            const now = new Date();
+            const dateStr = getCurrentDateString(); // Use existing helper
+            const actualHour = now.getHours();
+            const feedKey = `${dateStr}-${String(actualHour).padStart(2, '0')}`;
+    
+         // Load user settings
+            const settings = JSON.parse(localStorage.getItem('userSettings')) || {
+            liveEnabled: true,
+            audioEnabled: true,
+            prayerHours: [6, 12, 18, 21]
+    };
+    
+         // PRIORITY 1: Prayer Notification (handled separately by checkPrayerTime)
+         // Skip here, handled by separate function
+    
+         // PRIORITY 2: Live Feeds
+            if (settings.liveEnabled && LIVE_FEEDS[feedKey] && isLiveAllowedNow()) {
+            return {
+            type: 'live',
+            content: {
+                url: LIVE_FEEDS[feedKey],
+                title: 'Live Church Service'
+            },
+            audio: false
+        };
+    }
+    
+        // PRIORITY 3: Church Feeds (from external JSON)
+            if (CHURCH_FEEDS[feedKey]) {
+            return {
+            type: 'church',
+            content: CHURCH_FEEDS[feedKey],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 4: Liturgic Event Feeds (special days like Christmas, Easter)
+            if (LITURGIC_EVENT_FEEDS[dateStr]) {
+            return {
+            type: 'liturgic',
+            content: LITURGIC_EVENT_FEEDS[dateStr],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 5: Lectionary Feeds (daily readings based on liturgical calendar)
+            if (LECTIONARY_FEEDS[dateStr]) {
+            return {
+            type: 'lectionary',
+            content: LECTIONARY_FEEDS[dateStr],
+            audio: settings.audioEnabled && isAudioAllowedNow()
+        };
+    }
+    
+    // PRIORITY 6: FALLBACK - Use your existing verse rotation system
+           const verse = getTodaysVerse(); // ← THIS IS THE BRIDGE to your existing code
+           return {
+           type: 'default',
+           content: verse, // verse already has .title, .text, .ref
+           audio: settings.audioEnabled && isAudioAllowedNow()
+    };
+}
+
+    // Helper function: Check if live feeds allowed at this hour
+          function isLiveAllowedNow() {
+          const hour = new Date().getHours();
+          const hourIndex = hour <= 12 ? hour : hour - 12; // Convert to 12h
+          return !LIVE_FEED_RESTRICTIONS.restricted.includes(hourIndex);
+}
+
+// Helper function: Check if audio allowed at this hour
+    function isAudioAllowedNow() {
+    const hour = new Date().getHours();
+    const hourIndex = hour <= 12 ? hour : hour - 12; // Convert to 12h
+    return AUDIO_PERMISSIONS.allowed.includes(hourIndex);
+}
+
+// Helper function: Get date string (if you don't already have it)
+    function getCurrentDateString() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+    function preventScreenSleep() {
             // Method 1: Wake Lock API (modern browsers)
-            if ('wakeLock' in navigator) {
+    if ('wakeLock' in navigator) {
                 navigator.wakeLock.request('screen')
                     .then(wakeLock => {
                         console.log('Wake Lock enabled');
@@ -1006,7 +1450,7 @@
             }
             
             // Method 2: NoSleep.js technique - play silent video
-            const video = document.createElement('video');
+    const video = document.createElement('video');
             video.setAttribute('loop', '');
             video.setAttribute('muted', '');
             video.setAttribute('playsinline', '');
@@ -1018,7 +1462,7 @@
             document.body.appendChild(video);
             
             // Play video on any user interaction
-            const startVideo = () => {
+    const startVideo = () => {
                 video.play().catch(() => {});
                 document.removeEventListener('click', startVideo);
                 document.removeEventListener('touchstart', startVideo);
@@ -1044,14 +1488,14 @@
         window.addEventListener('load', function() {
             loadChurches();
             
-            const saved = localStorage.getItem('bibleDisplayConfig');
+    const saved = localStorage.getItem('bibleDisplayConfig');
             if (saved) {
                 config = JSON.parse(saved);
                 
                 // Update UI to reflect saved settings
                 document.querySelectorAll('.option-btn').forEach(btn => {
-                    const setting = btn.dataset.setting;
-                    const value = btn.dataset.value;
+    const setting = btn.dataset.setting;
+    const value = btn.dataset.value;
                     if (config[setting] === value) {
                         btn.classList.add('selected');
                     } else {
@@ -1061,13 +1505,121 @@
                 
                 // Set church selection
                 setTimeout(() => {
-                    const select = document.getElementById('church-select');
+    const select = document.getElementById('church-select');
                     if (select && config.church) {
                         select.value = config.church;
                     }
                 }, 500);
             }
         });
+        // Settings Panel Functions
+    function openSettingsPanel() {
+    // Load current settings
+    loadCurrentSettings();
+    document.getElementById('settings-panel').style.display = 'block';
+}
+
+    function closeSettingsPanel() {
+    document.getElementById('settings-panel').style.display = 'none';
+}
+
+    function loadCurrentSettings() {
+    // Load from localStorage
+    const settings = JSON.parse(localStorage.getItem('userSettings')) || {
+        audioEnabled: true,
+        liveEnabled: true,
+        theme: 'auto',
+        prayerHours: [6, 12, 18, 21]
+    };
+    
+    document.getElementById('audio-toggle').checked = settings.audioEnabled;
+    document.getElementById('live-toggle').checked = settings.liveEnabled;
+    document.getElementById('theme-select').value = settings.theme;
+    
+    // Set prayer hour checkboxes
+    document.querySelectorAll('.prayer-hour').forEach(checkbox => {
+        checkbox.checked = settings.prayerHours.includes(parseInt(checkbox.value));
+    });
+}
+
+    function saveSettings() {
+    const prayerHours = [];
+    document.querySelectorAll('.prayer-hour:checked').forEach(checkbox => {
+        prayerHours.push(parseInt(checkbox.value));
+    });
+    
+    const settings = {
+        audioEnabled: document.getElementById('audio-toggle').checked,
+        liveEnabled: document.getElementById('live-toggle').checked,
+        theme: document.getElementById('theme-select').value,
+        prayerHours: prayerHours
+    };
+    
+    localStorage.setItem('userSettings', JSON.stringify(settings));
+    
+    // Apply theme immediately
+    applyTheme(settings.theme);
+    
+    closeSettingsPanel();
+    
+    // Refresh display with new settings
+    updateDisplay();
+}
+
+    function applyTheme(theme) {
+    const body = document.getElementById('main-display');
+    const hour = new Date().getHours();
+    
+    if (theme === 'auto') {
+        // Auto dark mode 8 PM - 6 AM
+        if (hour >= 20 || hour < 6) {
+            body.classList.add('dark-theme');
+        } else {
+            body.classList.remove('dark-theme');
+        }
+    } else if (theme === 'dark') {
+        body.classList.add('dark-theme');
+    } else {
+        body.classList.remove('dark-theme');
+    }
+    function checkPrayerTime() {
+    const settings = JSON.parse(localStorage.getItem('userSettings')) || {prayerHours: []};
+    const now = new Date();
+    const hour = now.getHours();
+    const minute = now.getMinutes();
+    
+    // Show notification 2 minutes before prayer hour
+    if (minute === 58 && settings.prayerHours.includes(hour + 1)) {
+        showPrayerNotification();
+    }
+}
+
+    function showPrayerNotification() {
+    const lang = config.language || 'en';
+    const messages = {
+        en: "A day in His presence is worth a thousand elsewhere. We will pray in two minutes.",
+        fr: "Un jour dans sa présence vaut mille ailleurs. Nous allons prier dans deux minutes."
+    };
+    
+    document.getElementById('prayer-message').textContent = messages[lang];
+    document.getElementById('prayer-notification').style.display = 'block';
+    
+    // Play audio notification
+    if ('speechSynthesis' in window) {
+        const utterance = new SpeechSynthesisUtterance(messages[lang]);
+        utterance.lang = lang === 'fr' ? 'fr-FR' : 'en-US';
+        window.speechSynthesis.speak(utterance);
+    }
+    
+    // Hide after 2 minutes
+    setTimeout(() => {
+        document.getElementById('prayer-notification').style.display = 'none';
+    }, 120000);
+}
+
+// Check every 30 seconds
+setInterval(checkPrayerTime, 30000);
+
     </script>
 </body>
 </html>
